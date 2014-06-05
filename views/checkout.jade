@@ -1,0 +1,18 @@
+extends layout
+
+block content
+	div(class='pagetitle') #{title}
+	div(class='divbox', data-name='checkoutbox')
+		div(class='forminputbox')
+			input(type='text', name='street', placeholder='ulica', style='width: 40%;')
+			div(class='label') ulica
+		div(class='forminputbox')
+			input(type='text', name='apartment', placeholder='numer mieszkania', style='width: 40%;')
+			div(class='label') numer mieszkania
+		div(class='forminputbox')
+			input(type='submit', value='wyślij zamówienie')
+
+block sidecontent
+	div(class='pagetitle') #{subtitle}
+	div(class='divbox', data-name='orderlist')
+	div(class='orderbill', style='margin-bottom: 0;')

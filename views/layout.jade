@@ -1,0 +1,36 @@
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(src="/javascripts/jquery-2.1.1.min.js")
+		script(src="/javascripts/blur.js")
+		script(src="/javascripts/index.js")
+		script(src='/socket.io/socket.io.js')
+	body
+		div(class='header')
+			if loggedIn
+				div(class='useremail') #{useremail}
+				div(class='loginform')
+					a(href='/' class='submit') strona główna
+					if (usertype == 1)
+						a(href='/orders' class='submit') zamówienia
+					a(href='/logout' class='submit') wyloguj
+			else
+				form(action='/login', method='post', class='loginform')
+					div(class='logininputbox')
+						input(type='text', name='email', placeholder='email')
+						div(class='label') email
+					div(class='logininputbox')
+						input(type='password', name='password', placeholder='hasło')
+						div(class='label') hasło
+					div(class='logininputbox')
+						input(type='submit', value='loguj')
+					div(class='logininputbox')
+						a(href='/signup' class='submit') rejestracja
+		div(class='container')
+			div(class='container_switch')
+				block content
+		div(class='sider')
+			div(class='sider_switch')
+				block sidecontent

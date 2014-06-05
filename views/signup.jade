@@ -1,0 +1,13 @@
+extends layout
+
+block content
+	div(class='pagetitle') #{title}
+	form(action='/signup', method='post')
+		div(class='forminputbox')
+			input(type='text', name='email', placeholder='email', required='required')
+			div(class='label') email
+		div(class='forminputbox')
+			input(type='password', name='password', placeholder='hasło', required='required')
+			div(class='label') hasło
+		div(class='forminputbox')
+			input(type='submit', value='rejestruj')

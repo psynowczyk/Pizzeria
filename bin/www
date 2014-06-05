@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+var debug = require('debug')('pizzeria2');
+var app = require('../app');
+
+app.set('port', process.env.PORT || 3000);
+
+var io = require('socket.io').listen(app.listen(app.get('port')));
+
+// var server = app.listen(app.get('port'), function() {
+//   debug('Express server listening on port ' + server.address().port);
+// });
+
+io.sockets.on('connection', function (socket) {
+   socket.on('finalizeOrder', function (data) {
+   	socket.broadcast.emit('order', data);
+   });
+});

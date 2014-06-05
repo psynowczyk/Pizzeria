@@ -1,0 +1,73 @@
+extends layout
+
+block content
+	div(class='pagetitle') #{title}
+	if loggedIn
+		div(class='divbox')
+			div(class='pizzalistbox')
+				div(class='pizzaname') Margherita
+				div(class='pizzaing') Sos, Ser, Oregano
+				div(class='pizzasizeinp', data-pn='Margherita', data-size='30') 30cm / 15zł
+				div(class='pizzasizeinp', data-pn='Margherita', data-size='40') 40cm / 20zł
+				div(class='pizzasizeinp', data-pn='Margherita', data-size='50') 50cm / 25zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Capricciosa
+				div(class='pizzaing') Pieczarki, Szynka, Ser, Sos
+				div(class='pizzasizeinp', data-pn='Capricciosa', data-size='30') 30cm / 16zł
+				div(class='pizzasizeinp', data-pn='Capricciosa', data-size='40') 40cm / 21zł
+				div(class='pizzasizeinp', data-pn='Capricciosa', data-size='50') 50cm / 26zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Hawai
+				div(class='pizzaing') Ananas, Brzoskwinia, Ser, Sos
+				div(class='pizzasizeinp', data-pn='Hawai', data-size='30') 30cm / 16zł
+				div(class='pizzasizeinp', data-pn='Hawai', data-size='40') 40cm / 21zł
+				div(class='pizzasizeinp', data-pn='Hawai', data-size='50') 50cm / 26zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Diabolo
+				div(class='pizzaing') Jalapeno, Oliwki, Szynka, Ser, Sos
+				div(class='pizzasizeinp', data-pn='Diabolo', data-size='30') 30cm / 17zł
+				div(class='pizzasizeinp', data-pn='Diabolo', data-size='40') 40cm / 22zł
+				div(class='pizzasizeinp', data-pn='Diabolo', data-size='50') 50cm / 27zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Vesuvio
+				div(class='pizzaing') Salami, Szynka, Ser, Sos
+				div(class='pizzasizeinp', data-pn='Vesuvio', data-size='30') 30cm / 16zł
+				div(class='pizzasizeinp', data-pn='Vesuvio', data-size='40') 40cm / 21zł
+				div(class='pizzasizeinp', data-pn='Vesuvio', data-size='50') 50cm / 26zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Mafioso
+				div(class='pizzaing') Pieczarki, Bekon, Ser, Sos
+				div(class='pizzasizeinp', data-pn='Mafioso', data-size='30') 30cm / 16zł
+				div(class='pizzasizeinp', data-pn='Mafioso', data-size='40') 40cm / 21zł
+				div(class='pizzasizeinp', data-pn='Mafioso', data-size='50') 50cm / 26zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Trzy sery
+				div(class='pizzaing') Mozzarella, Oliwki, Ser pleśniak, Sos, Ser gouda
+				div(class='pizzasizeinp', data-pn='Trzy sery', data-size='30') 30cm / 17zł
+				div(class='pizzasizeinp', data-pn='Trzy sery', data-size='40') 40cm / 22zł
+				div(class='pizzasizeinp', data-pn='Trzy sery', data-size='50') 50cm / 27zł
+			div(class='pizzalistbox')
+				div(class='pizzaname') Pizza Szefa
+				div(class='pizzaing') Pieczarki, Salami, Papryka peperoni, Kiełbasa, Bekon, Podwójny ser, Cebula, Sos
+				div(class='pizzasizeinp', data-pn='Pizza Szefa', data-size='30') 30cm / 20zł
+				div(class='pizzasizeinp', data-pn='Pizza Szefa', data-size='40') 40cm / 25zł
+				div(class='pizzasizeinp', data-pn='Pizza Szefa', data-size='50') 50cm / 30zł
+	else
+		div Zaloguj się aby złożyć zamówienie.
+
+block sidecontent
+	div(class='pagetitle') #{subtitle}
+	if(!loggedIn)
+		form(action='/signup', method='post')
+			div(class='forminputbox')
+				input(type='text', name='email', placeholder='email', required='required')
+				div(class='label') email
+			div(class='forminputbox')
+				input(type='password', name='password', placeholder='hasło', required='required')
+				div(class='label') hasło
+			div(class='forminputbox')
+				input(type='submit', value='rejestruj')
+	else
+		div(class='divbox', data-name='orderlist')
+		div(class='orderbill')
+		a(href="/checkout", class="submit", data-name="checkoutlink") finalizuj zamówienie
