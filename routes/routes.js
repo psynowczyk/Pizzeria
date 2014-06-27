@@ -1,4 +1,5 @@
 var Order = require('../models/order');
+var User = require('../models/user');
 var mongoose = require('mongoose');
 var ioc = require('socket.io-client');
 var csocket = ioc.connect('localhost', { port: 3000 });
@@ -13,13 +14,13 @@ module.exports = function(app, passport) {
 	});
 
 	// index
-	app.get('/', function(req, res) {
+	app.get('/', isNotBanned, function(req, res) {
 		var subtitle = '';
 		if (req.isAuthenticated()) subtitle = 'Twoje zamówienie';
 		else subtitle = 'Rejestracja';
 		res.render('index', { 'title': 'Pizza online', 'subtitle': subtitle, 'user': req.isAuthenticated() });
 	});
-	app.post('/', function(req, res) {
+	app.post('/', isNotBanned, function(req, res) {
 		var action = req.body.action;
 		var date = Date.now();
 		var email = req.user.local.email;
@@ -70,6 +71,55 @@ module.exports = function(app, passport) {
 				else res.send('success');
 			});
 		}
+		else if(action == 'banUser' && req.isAuthenticated()) {
+			var client = String(req.body.client);
+			if(client != req.user.local.email) {
+				User.findOne({ 'local.email': client }, function(err, user) {
+					if(!err && user) {
+						user.local.acstatus = 'banned';
+						user.save(function (err) {
+							if(err) console.log(err);
+							else {
+								Order.find({ 'email': client +'_finalized', 'status': 'awaiting' }, function(err, order) {
+									if(!err && order) {
+										for(var i = 0; i < order.length; i++) {
+											order[i].status = 'declined';
+											order[i].save(function (err) {
+												if(err) console.log(err);
+											});
+										}
+										res.send('success');
+									}
+									else {
+										if(err) console.log(err);
+										else res.send('noorders');
+									}
+								});
+								// Order.update({ 'email': client +'_finalized', 'status': 'awaiting' }, { 'status': 'declined' }, { upsert: false }, function(err){
+								// 	if(err) console.log(err);
+								// 	else res.send('success');
+								// });
+							}
+						});
+					}
+					else {
+						if(err) console.log(err);
+						else res.send('nouser');
+					}
+				});
+
+				// User.update({ 'local.email': client }, { 'acstatus': 'banned' }, { upsert: false }, function(err){
+				// 	if(err) console.log(err);
+				// 	else {
+				// 		Order.update({ 'email': email }, { 'status': 'declined' }, { upsert: false }, function(err){
+				// 			if(err) console.log(err);
+				// 			else res.send('success');
+				// 		});
+				// 	}
+				// });
+			}
+			else res.send('sameuser');
+		}
 	});
 
 	// login
@@ -105,6 +155,11 @@ module.exports = function(app, passport) {
 		res.render('checkout', { 'title': 'Finalizacja zamówienia', 'subtitle': 'Twoje zamówienie', 'user': req.isAuthenticated() });
 	});
 
+	// accountissue
+	app.get('/accountissue', isBanned, function(req, res) {
+		res.render('accountissue', { 'title': 'Problem z kontem użytkownika', 'user': req.isAuthenticated() });
+	});
+
 };
 
 function isLoggedIn(req, res, next) {
@@ -124,6 +179,20 @@ function isLoggedOut(req, res, next) {
 function isAdmin(req, res, next) {
 	// if user is authenticated in the session, carry on 
 	if (req.isAuthenticated() && req.user.local.usertype == 1)
+		return next();
+	// if they aren't redirect them to the home page
+	res.redirect('/');
+}
+function isNotBanned(req, res, next) {
+	// if user is authenticated in the session, carry on 
+	if ((req.isAuthenticated() && req.user.local.acstatus != 'banned') || !req.isAuthenticated())
+		return next();
+	// if they aren't redirect them to the home page
+	res.redirect('/accountissue');
+}
+function isBanned(req, res, next) {
+	// if user is authenticated in the session, carry on 
+	if (req.isAuthenticated() && req.user.local.acstatus == 'banned')
 		return next();
 	// if they aren't redirect them to the home page
 	res.redirect('/');

@@ -1,18 +1,3 @@
-/*
-function checkCookie(cookiename) {
-	if (document.cookie.indexOf(cookiename) >= 0) return true;
-	else return false;
-}
-
-function setCookie(cname, cvalue, exdays) {
-	var d = new Date();
-	d.setTime(d.getTime() + (exdays*24*60*60*1000));
-	var expires = "expires="+d.toGMTString();
-	if(checkCookie(cname)) document.cookie = cname + '=' + cname"username=John Smith; expires=Thu, 18 Dec 2013 12:00:00 GMT; path=/";
-	else document.cookie = cname + "=" + cvalue + "; " + expires;
-}
-*/
-
 function resetOrders() {
 	var orderarray = new Array();
 	postdata = { action: 'midOrder', 'order': orderarray.toString(), 'bill': '' };
@@ -287,15 +272,18 @@ $(document).ready(function() {
 		   			hour = temparray[0];
 		   			minute = temparray[1];
 		   			$('.divbox[data-name="orderslist"]').append(
-		   				'<div class="pizzalistbox" data-type="sup">'+
-		   					'<div class="odleftbox" style="width: 40%;">'+
+		   				'<div class="pizzalistbox" data-type="sup" data-client="'+ orderObj.email.replace('_finalized', '') +'">'+
+		   					'<div class="odleftbox" style="width: 30%;">'+
 			   					'<div class="odemail" style="width: 100%;">klient: '+ orderObj.email.replace('_finalized', '') +'</div>'+
 			   					'<div class="oddate" style="width: 100%;">data: '+ day +'.'+ month +'.'+ year +' '+ hour +':'+ minute +'</div>'+
 			   					'<div class="odstreet" style="width: 100%;">adres: '+ orderObj.street +' '+ orderObj.apartment +'</div>'+
 			   					'<div class="odbill" style="width: 100%;">kwota: '+ orderObj.bill +' zł</div>'+
 			   				'</div>'+
 		   					'<div class="odpizzaslist" style="width: 50%;">'+ pizzaresult +'</div>'+
-		   					'<input type="submit" data-email="'+ orderObj.email +'" data-date="'+ orderObj.date +'" value="archiwizuj" style="margin-top: 21px;" />'+
+		   					'<div style="width: 20%;">'+
+		   						'<input type="submit" data-email="'+ orderObj.email +'" data-date="'+ orderObj.date +'" value="archiwizuj" style="width: calc(100% - 22px); margin-top: 5px;" />'+
+		   						'<input type="submit" data-truemail="'+ orderObj.email.replace('_finalized', '') +'" value="zbanuj użytkownika" style="width: calc(100% - 22px); margin-top: 5px;" />'+
+		   					'</div>'+
 		   				'</div>'
 		   			);
 		   		}
@@ -315,6 +303,24 @@ $(document).ready(function() {
 			   data: JSON.stringify(postdata),
 			   success: function() {
 			   	cuele.parent().hide(300, function(){ $(this).remove(); });
+			   }
+			});
+		});
+
+		$(document).on('click', 'input[type="submit"][value="zbanuj użytkownika"]', function() {
+			var client = $(this).attr('data-truemail');
+			var cuele = $('.pizzalistbox[data-client="'+ client +'"]');
+			var postdata = { action: 'banUser', 'client': client };
+			$.ajax({
+			   url: '/',
+			   type: 'POST',
+			   contentType: 'application/json',
+			   data: JSON.stringify(postdata),
+			   success: function(result) {
+			   	if(result == 'sameuser') alert('Nie możesz zbanować sam siebie!');
+			   	else if(result == 'nouser') alert('Błąd bazy danych!');
+			   	else if(result == 'noorders') alert('Błąd bazy danych!');
+			   	else cuele.hide(300, function(){ $(this).remove(); });
 			   }
 			});
 		});
@@ -341,21 +347,27 @@ $(document).ready(function() {
 			hour = temparray[0];
 			minute = temparray[1];
 			$('.divbox[data-name="orderslist"]').append(
-				'<div class="pizzalistbox" data-type="sup">'+
-					'<div class="odleftbox" style="width: 40%;">'+
+				'<div class="pizzalistbox" data-type="sup" data-client="'+ orderObj.email.replace('_finalized', '') +'">'+
+					'<div class="odleftbox" style="width: 30%;">'+
    					'<div class="odemail" style="width: 100%;">klient: '+ data.email.replace('_finalized', '') +'</div>'+
    					'<div class="oddate" style="width: 100%;">data: '+ day +'.'+ month +'.'+ year +' '+ hour +':'+ minute +'</div>'+
    					'<div class="odstreet" style="width: 100%;">adres: '+ data.street +' '+ data.apartment +'</div>'+
    					'<div class="odbill" style="width: 100%;">kwota: '+ data.bill +' zł</div>'+
    				'</div>'+
 					'<div class="odpizzaslist" style="width: 50%;">'+ pizzaresult +'</div>'+
-					'<input type="submit" data-email="'+ data.email +'" data-date="'+ data.date +'" value="archiwizuj" style="margin-top: 21px;" />'+
+					'<div style="width: 20%;">'+
+						'<input type="submit" data-email="'+ data.email +'" data-date="'+ data.date +'" value="archiwizuj" style="calc(100% - 22px); margin-top: 5px;" />'+
+						'<input type="submit" data-truemail="'+ data.email.replace('_finalized', '') +'" value="zbanuj użytkownika" style="calc(100% - 22px); margin-top: 5px;" />'+
+					'</div>'+
 				'</div>'
 			);
 			//$('.divbox[data-name="orderslist"]').append('<div class="divbox">'+ data.order +'</div>');
    	});
 	}
 	else if(site == '/signup') {
+		$('.sider').hide();
+	}
+	else if(site == '/accountissue') {
 		$('.sider').hide();
 	}
 });
